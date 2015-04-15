@@ -1,0 +1,15 @@
+# Place me in /etc/systemd/system and run systemctl enable cd00rd.service
+
+[Unit]
+Description=start the cd00r daemon
+Requires=iptables.service
+After=iptables.service
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/cd00rd > /var/log/cd00rd.log
+
+[Install]
+Requires=iptables.service
+After=iptables.service
+
