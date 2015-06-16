@@ -1,15 +1,18 @@
 # Place me in /etc/systemd/system and run systemctl enable cd00rd.service
+# We require the networking to be fully up so its not enough to have iptables we also need netctl
 
 [Unit]
-Description=start the cd00r daemon
+Description=cd00r daemon
 Requires=iptables.service
+Requires=netctl.service
 After=iptables.service
+After=netctl.service
 
 [Service]
-Type=forking
-ExecStart=/usr/bin/cd00rd > /var/log/cd00rd.log
+Type=simple
+ExecStart=/usr/bin/cd00rd
+User=cd00r
+Group=cd00r
 
 [Install]
-Requires=iptables.service
-After=iptables.service
-
+WantedBy=multi-user.target
