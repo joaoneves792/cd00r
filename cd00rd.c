@@ -128,6 +128,10 @@ int main(int argc, char** argv)
         if(NULL == userInfo)
 	        return (-1); //The cd00r user doesnt exist on this system
         uid_t uid = userInfo->pw_uid;
+	gid_t gid = userInfo->pw_gid;
+
+	if(setgid(gid))
+		return(-1); //Unable to drop permissions (change group to cd00r)
 
 	if(setuid(uid))
 		return(-1); //Unable to drop permissions (change user to cd00r)
