@@ -9,12 +9,16 @@
 #include <pcap.h>
 #include <signal.h>
 #include <time.h>
+#include <pwd.h>
 #include "TCPIPpacket.h"
 
 #define SNIFF_PORT 7073
 #define SEQUENCE_NUMBER 149112667
 #define OPEN_ACK_NUMBER 777
 #define CLOSE_ACK_NUMBER 333
+#define CD00R_USERNAME "cd00r"
+#define MAX_IP_STRING_LENGTH 16
+#define MAX_COMMAND_LENGTH 8 + MAX_IP_STRING_LENGTH
 
 int logFile;
 char backdoorOpen = 0;
@@ -51,7 +55,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	int size_ip;
 	int size_tcp;
 	
-	char command[70];
+	char command[MAX_COMMAND_LENGTH];
 	char* timeStamp;
 
 
@@ -75,7 +79,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}
 	
 	timeStamp = timestamp();
-	dprintf(logFile, "[%s] Got a packet on port %d from %s\n", timeStamp, SNIFF_PORT,  inet_ntoa(ip->ip_src));
+	dprintf(logFile, "[%s] Got a packet from %s\n", timeStamp, inet_ntoa(ip->ip_src));
 	free(timeStamp);
 	/*OK so far we got ourselves all we need, the tcp header*/
 
@@ -86,7 +90,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	/*if((tcp->th_flags & (TH_SYN | TH_FIN)) == (TH_SYN | TH_FIN)){  CANT DO THIS -> FILTERED BY THE ROUTERS FIREWALL*/ 
 		if(!backdoorOpen){
 			dprintf(logFile,"	Recieved command to open the port\n");
-			sprintf(command, "iptables -I TCP -p tcp --dport 22 -s %s -j ACCEPT", inet_ntoa(ip->ip_src));
+			sprintf(command, "lock 1 %s", inet_ntoa(ip->ip_src));
 			if(!system(command))
 				backdoorOpen = 1;
 			
@@ -96,7 +100,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}else if(tcp->th_ack == CLOSE_ACK_NUMBER){
 		if(backdoorOpen){
 			dprintf(logFile,"	Recieved command to close the port\n");
-			sprintf(command, "iptables -D TCP -p tcp --dport 22 -s %s -j ACCEPT", inet_ntoa(ip->ip_src));
+			sprintf(command, "lock 0 %s", inet_ntoa(ip->ip_src));
 			if(!system(command))
 				backdoorOpen = 0;
 		}
@@ -117,6 +121,16 @@ int main(int argc, char** argv)
 	bpf_u_int32 net;		/* The IP of our sniffing device */
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	const u_char *packet;		/* The actual packet */
+
+	logFile = open("/var/log/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
+
+        struct passwd* userInfo = getpwnam(CD00R_USERNAME);
+        if(NULL == userInfo)
+	        return (-1); //The cd00r user doesnt exist on this system
+        uid_t uid = userInfo->pw_uid;
+
+	if(setuid(uid))
+		return(-1); //Unable to drop permissions (change user to cd00r)
 
 	if(argc > 1)
         	dev = argv[1];
@@ -154,7 +168,6 @@ int main(int argc, char** argv)
 		return(-1);
 	}
 
-	logFile = open("/var/log/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
 
 	/*So we can close everything nicely on Ctrl+C...*/
 	signal(SIGINT, intHandler);
