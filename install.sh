@@ -17,6 +17,7 @@ chown root:root /usr/bin/lock
 
 mkdir /var/log/cd00rd
 chown root:cd00r /var/log/cd00rd
+chmod g+w /var/log/cd00rd
 
 chmod u+s /usr/bin/lock
 setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' /usr/bin/cd00rd
