@@ -23,9 +23,8 @@
 	is used).
 
 	Installation:
-	Place the cd00rd.service file in /etc/systemd/system and 
-	run systemctl enable cd00rd.service
-	Copy (or link) cd00rd to /usr/bin/cd00rd
-	Create its own user useradd -M -s /usr/bin/nologin cd00r
-	Run setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' /usr/bin/cd00rd
+        run make
+        run ./install.sh as root
+        enable the cd00rd.service in systemd
+
 */
