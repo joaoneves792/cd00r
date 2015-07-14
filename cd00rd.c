@@ -9,14 +9,12 @@
 #include <pcap.h>
 #include <signal.h>
 #include <time.h>
-#include <pwd.h>
 #include "TCPIPpacket.h"
 
 #define SNIFF_PORT 7073
 #define SEQUENCE_NUMBER 149112667
 #define OPEN_ACK_NUMBER 777
 #define CLOSE_ACK_NUMBER 333
-#define CD00R_USERNAME "joao"
 #define MAX_IP_STRING_LENGTH 16
 #define MAX_COMMAND_LENGTH 8 + MAX_IP_STRING_LENGTH
 
@@ -107,6 +105,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}
 }
 
+/*
+ * For future reference (no longer necessary here)
 void dropPermissions(){
 	struct passwd* userInfo = getpwnam(CD00R_USERNAME);
         if(NULL == userInfo)
@@ -120,7 +120,7 @@ void dropPermissions(){
 	if(setuid(uid))
 		exit(-1); //Unable to drop permissions (change user to cd00r)
 }
-
+*/
 
 int main(int argc, char** argv)
 {
@@ -134,6 +134,12 @@ int main(int argc, char** argv)
 	bpf_u_int32 net;		/* The IP of our sniffing device */
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	const u_char *packet;		/* The actual packet */
+
+	if(!getuid()){
+		fprintf(stderr, "Dont run me as root!! read the instructions first!!\n");
+		return(-1);
+	}
+
 
 	logFile = creat("/var/log/cd00rd/cd00rd.log", (S_IWUSR | S_IRUSR | S_IROTH) );
 	//logFile = open("/var/log/cd00rd/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
@@ -163,7 +169,7 @@ int main(int argc, char** argv)
 		return(-1);
 	}	
         
-	
+	//No longer necessary as we are now never even suposed to start with root permissions	
 	//dropPermissions();
 
 
