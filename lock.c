@@ -11,7 +11,7 @@
 #define MIN_ACCEPTABLE_ARGUMENTS 3
 #define ARGUMENT_IP 2
 #define ARGUMENT_OPEN_CLOSE 1
-#define ALLOWED_USERNAME "joao"
+#define ALLOWED_USERNAME "cd00r"
 
 /*
  * Simple program to open and close port 22
