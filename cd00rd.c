@@ -135,7 +135,9 @@ int main(int argc, char** argv)
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	const u_char *packet;		/* The actual packet */
 
-	logFile = open("/var/log/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
+	logFile = creat("/var/log/cd00rd/cd00rd.log", (S_IWUSR | S_IRUSR | S_IROTH) );
+	//logFile = open("/var/log/cd00rd/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
+	//logFile = open("./cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));
 
 	if(argc > 1)
         	dev = argv[1];
@@ -162,7 +164,7 @@ int main(int argc, char** argv)
 	}	
         
 	
-	dropPermissions();
+	//dropPermissions();
 
 
 	sprintf(sniff_port, "%d", SNIFF_PORT);
