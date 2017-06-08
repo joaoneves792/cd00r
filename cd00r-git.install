@@ -1,0 +1,17 @@
+post_install() {
+	useradd -M -s /usr/bin/nologin cd00r
+
+	chown root:root $pkgdir/usr/bin/cd00rd
+	chown root:root $pkgdir/usr/bin/lock
+
+	chown root:cd00r $pkgdir/var/log/cd00rd
+	chmod g+w $pkgdir/var/log/cd00rd
+
+	chmod u+s $pkgdir/usr/bin/lock
+	setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' $pkgdir/usr/bin/cd00rd
+}
+
+pre_remove() {
+	userdel cd00r
+}
+
