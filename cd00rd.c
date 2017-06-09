@@ -134,12 +134,16 @@ int main(int argc, char** argv)
 	bpf_u_int32 net;		/* The IP of our sniffing device */
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	const u_char *packet;		/* The actual packet */
+	int pid_file;
 
 	if(!getuid()){
 		fprintf(stderr, "Dont run me as root!! read the instructions first!!\n");
 		return(-1);
 	}
 
+	pid_file = creat("/var/run/cd00rd.pid", (S_IWUSR | S_IRUSR | S_IROTH) );
+	dprintf(pid_file, "%d", getpid());
+	close(pid_file);
 
 	logFile = creat("/var/log/cd00rd/cd00rd.log", (S_IWUSR | S_IRUSR | S_IROTH) );
 	//logFile = open("/var/log/cd00rd/cd00rd.log", (O_CREAT | O_WRONLY | O_TRUNC));

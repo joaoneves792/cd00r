@@ -2,15 +2,15 @@
 # Maintainer: Joao Neves <joaoneves792@gmail.com>
 reponame=cd00r
 pkgname=${reponame%}-git
-pkgver=r16.9655134
+pkgver=r17.6790e2d
 pkgrel=1
 pkgdesc=""
 arch=('x86_64')
 url=""
 license=('GPL')
 groups=()
-depends=('libpcap', 'iptables')
-makedepends=('git') 
+depends=('libpcap' 'iptables')
+makedepends=('git' 'libpcap') 
 provides=("${pkgname%}")
 conflicts=("${pkgname%}")
 replaces=()
@@ -43,10 +43,13 @@ check() {
 
 package() {
 	cd "$srcdir/${reponame%}"
-	mkdir -p $pkgdir/usr/lib/systemd/system/
+	mkdir -p $pkgdir/usr/lib/systemd/system
+	mkdir -p $pkgdir/etc/tmpfiles.d
 	mkdir -p $pkgdir/usr/bin
 	mkdir -p $pkgdir/var/log/cd00rd
+
 	cp ./cd00rd.service $pkgdir/usr/lib/systemd/system/
+	cp ./cd00rd.conf $pkgdir/etc/tmpfiles.d/ 
 	cp ./cd00rd $pkgdir/usr/bin/
 	cp ./lock $pkgdir/usr/bin/
 
