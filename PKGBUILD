@@ -2,8 +2,8 @@
 # Maintainer: Joao Neves <joaoneves792@gmail.com>
 reponame=cd00r
 pkgname=${reponame%}-git
-pkgver=r17.6790e2d
-pkgrel=1
+pkgver=r18.cb593f2
+pkgrel=2
 pkgdesc=""
 arch=('x86_64')
 url=""

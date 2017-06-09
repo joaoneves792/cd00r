@@ -17,3 +17,6 @@ pre_remove() {
 	userdel cd00r
 }
 
+post_upgrade() {
+	systemd-tmpfiles --create
+}
