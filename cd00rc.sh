@@ -1,14 +1,16 @@
-#! /bin/zsh
+#! /bin/sh
 # Joao Neves 13-12-2014
 
-echo "\e[0;32m"
+GREEN="\e[0;32m"
+NORMAL="\e[1;37m"
+echo -e "${GREEN}"
 
 echo "             _____  ___     "
 echo "     _______/ / _ \/ _ \____"
 echo "    / __/ _  / // / // / __/"
 echo "    \__/\_,_/\___/\___/_/   "
 
-echo "\e[1;37m"
+echo -e "${NORMAL}"
 function check_port {
 	port=$1
 	warping warpenguin.no-ip.org -syn -p $port -n 1 -w 1 | grep timed > /dev/null
